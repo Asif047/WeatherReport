@@ -1,12 +1,18 @@
 package com.pencilbox.user.getcurrentlocation;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -65,6 +71,30 @@ public class MainActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+
+        //new starts
+
+        if(!isConnected(MainActivity.this))buildDialog(MainActivity.this).show();
+        else
+        {
+
+        }
+        //new ends
+
+
+        //new starts
+
+        if (!isGPSOn(MainActivity.this))buildDialog2(MainActivity.this).show();
+        else
+        {
+
+        }
+
+        //new ends
+
 
 
 
@@ -127,27 +157,27 @@ public class MainActivity  extends AppCompatActivity {
 
 
 
-        checkNetwork();
+       // checkNetwork();
 
     }
 
 
 
 
-    private void checkNetwork() {
-        NetworkUtil networkUtil = new NetworkUtil(this);
-        if (!networkUtil.isNetworkAvailable()) {
-            networkUtil.showNoNetworkDialog("Please turn on the Internet & restart the app");
-
-            return;
-        }
-
-        if (!networkUtil.isGPSon()) {
-            networkUtil.showNoNetworkDialog("Please turn on the GPS & restart the app");
-        }
-
-
-    }
+//    private void checkNetwork() {
+//        NetworkUtil networkUtil = new NetworkUtil(this);
+//        if (!networkUtil.isNetworkAvailable()) {
+//            networkUtil.showNoNetworkDialog("Please turn on the Internet & restart the app");
+//
+//            return;
+//        }
+//
+//        if (!networkUtil.isGPSon()) {
+//            networkUtil.showNoNetworkDialog("Please turn on the GPS & restart the app");
+//        }
+//
+//
+//    }
 
 
 
@@ -283,4 +313,115 @@ public class MainActivity  extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+
+
+
+    //back button operation starts
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+
+    //back button operation ends
+
+
+
+//new starts
+    public boolean isConnected(Context context)
+    {
+        ConnectivityManager cm= (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo networkInfo=cm.getActiveNetworkInfo();
+
+        if(networkInfo!=null && networkInfo.isConnectedOrConnecting())
+        {
+            android.net.NetworkInfo wifi=cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            android.net.NetworkInfo mobile=cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if((mobile!=null && mobile.isConnectedOrConnecting())||(wifi!=null && wifi.isConnectedOrConnecting()))
+                return true;
+            else
+                return false;
+
+        }
+        else
+            return false;
+    }
+
+
+
+
+    public AlertDialog.Builder buildDialog(Context c)
+    {
+        AlertDialog.Builder builder=new AlertDialog.Builder(c);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("You need to have mobile data or wifi to access this.Press ok to exit");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+
+        return builder;
+    }
+
+
+//new ends
+
+
+
+
+    //new starts
+    public boolean isGPSOn(Context context)
+    {
+        LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE );
+        boolean statusOfGPS = manager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        System.out.print("GPS STATUS"+statusOfGPS);
+
+        return  statusOfGPS;
+    }
+
+
+
+    public AlertDialog.Builder buildDialog2(Context c)
+    {
+        AlertDialog.Builder builder=new AlertDialog.Builder(c);
+        builder.setTitle("Turn on the GPS");
+        builder.setMessage("You need to turn on the GPS.Press ok to exit");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+
+        return builder;
+    }
+
+//new ends
+
+
+
+
+
+
 }

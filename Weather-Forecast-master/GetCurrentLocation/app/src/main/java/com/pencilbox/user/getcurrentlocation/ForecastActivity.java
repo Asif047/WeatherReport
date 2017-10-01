@@ -1,6 +1,8 @@
 package com.pencilbox.user.getcurrentlocation;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -90,6 +92,35 @@ public class ForecastActivity extends AppCompatActivity {
         startActivity(intent);
 
     }
+
+
+
+
+    //back button operation starts
+
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+                .setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+
+    //back button operation ends
+
+
 
 }
 
